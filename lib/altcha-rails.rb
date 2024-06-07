@@ -33,7 +33,7 @@ module Altcha
       a.algorithm = Altcha.algorithm
       a.salt = [Time.now.to_s, SecureRandom.hex(12)].join('|')
       a.challenge = Digest::SHA256.hexdigest(a.salt + secret_number.to_s)
-      a.signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new(a.algorithm), Altcha.hmac_key, a.challenge)
+      a.signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new(a.algorithm.sub('-', ''), Altcha.hmac_key, a.challenge)
 
       return a
     end
@@ -58,7 +58,7 @@ module Altcha
 
       return @algorithm == Altcha.algorithm &&
         @challenge == check &&
-        @signature == OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new(Altcha.algorithm), Altcha.hmac_key, check) &&
+        @signature == OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new(Altcha.algorithm.sub('-', '')), Altcha.hmac_key, check) &&
         t.present? && t > Time.now - Altcha.timeout && t < Time.now
     end
   end
